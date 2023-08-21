@@ -120,6 +120,7 @@ app.get("/matches/:matchId/", async (request, response) => {
 //API 5
 //Returns a list of all the matches of a player
 app.get("/players/:playerId/matches/", async (request, response) => {
+  const { playerId } = request.params;
   const getPlayerMatchQuery = `
     SELECT
       *
@@ -129,9 +130,11 @@ app.get("/players/:playerId/matches/", async (request, response) => {
        match_details
     WHERE
       player_id = ${playerId};`;
-  const match = await database.get(getPlayerMatchQuery);
+  const playerMatches = await database.all(getPlayerMatchQuery);
   response.send(
-    match.map((eachMatch) => convertMatchDbObjectToResponseObject(eachMatch))
+    playerMatches.map((eachMatch) =>
+      convertMatchDbObjectToResponseObject(eachMatch)
+    )
   );
 });
 
@@ -169,7 +172,7 @@ app.get("/matches/:matchId/players", async (request, response) => {
 //API 7
 app.get("/players/:playerId/playerScores/", async (request, response) => {
   const { playerId } = request.params;
-  const getmatchPlayersQuery = `
+  const getMatchPlayersQuery = `
     SELECT
       player_id AS playerId,
       player_name AS playerName,
@@ -180,7 +183,7 @@ app.get("/players/:playerId/playerScores/", async (request, response) => {
       NATURAL JOIN player_details
     WHERE
       player_id = ${playerId};`;
-  const playersMatchDetails = await database.get(getmatchPlayersQuery);
+  const playersMatchDetails = await database.get(getMatchPlayersQuery);
   response.send(playersMatchDetails);
 });
 
